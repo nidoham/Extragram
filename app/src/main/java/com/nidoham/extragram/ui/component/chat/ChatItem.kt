@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.nidoham.extragram.ui.theme.TelegramAvatarSize
 import com.nidoham.extragram.ui.theme.TelegramSpacing
 import com.nidoham.extragram.ui.theme.telegram
+import com.nidoham.extragram.util.ColorGenerator
 
 @Composable
 fun ChatItem(
@@ -55,7 +56,7 @@ fun ChatItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(chat.avatarColor, CircleShape),
+                    .background(ColorGenerator.getRandomColor(), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

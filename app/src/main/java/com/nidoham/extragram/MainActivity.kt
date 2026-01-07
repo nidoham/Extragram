@@ -4,16 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,19 +18,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PermContactCalendar
 import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -52,20 +45,32 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
+import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
+import com.nidoham.extra.user.UserInfo
+import com.nidoham.extra.user.UserRepository
+import com.nidoham.extragram.ui.component.chat.Chat
+import com.nidoham.extragram.ui.component.chat.ChatItem
+import com.nidoham.extragram.ui.theme.ExtragramTheme
 import com.nidoham.extragram.ui.theme.telegram
 import kotlinx.coroutines.launch
-import com.nidoham.extragram.ui.component.chat.*
-import com.nidoham.extragram.ui.theme.ExtragramTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +83,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelegramMainScreen() {
@@ -86,18 +92,28 @@ fun TelegramMainScreen() {
     val view = LocalView.current
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    // Update status bar color when drawer state changes
+    val currentUserState = remember { mutableStateOf<UserInfo?>(null) }
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                val userRepository = UserRepository()
+                currentUserState.value = userRepository.getUser(userId)
+            }
+        }
+    }
+
+
     LaunchedEffect(drawerState) {
         snapshotFlow { drawerState.currentValue }
             .collect { drawerValue ->
                 val window = (view.context as ComponentActivity).window
-                // Always use primary color for status bar
                 window.statusBarColor = primaryColor.toArgb()
                 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
             }
     }
 
-    // Also set on initial composition
     SideEffect {
         val window = (view.context as ComponentActivity).window
         window.statusBarColor = primaryColor.toArgb()
@@ -106,16 +122,16 @@ fun TelegramMainScreen() {
 
     val chats = remember {
         listOf(
-            Chat(1, "Saved Messages", "You: Photo", "12:45", Color(0xFF5CA7F5), 0, true),
-            Chat(2, "Alice Johnson", "Hey! How are you doing?", "Yesterday", Color(0xFFE91E63), 3, true, true),
-            Chat(3, "Tech Group", "John: Check out this new feature", "Yesterday", Color(0xFF9C27B0), 12, true),
-            Chat(4, "Bob Smith", "Thanks for the help!", "Monday", Color(0xFF3F51B5), 0, false, true),
-            Chat(5, "Work Team", "Meeting at 3 PM tomorrow", "Monday", Color(0xFF00BCD4), 5, false, false, true),
-            Chat(6, "Mom", "Don't forget to call grandma", "Sunday", Color(0xFFFF9800), 1),
-            Chat(7, "Developers Channel", "New update released! 🚀", "Sunday", Color(0xFF4CAF50)),
-            Chat(8, "Charlie Brown", "See you tomorrow!", "Saturday", Color(0xFFFF5722), 0, false, true),
-            Chat(9, "Study Group", "Assignment due next week", "Friday", Color(0xFF795548), 2),
-            Chat(10, "Diana Prince", "Thanks for the invite!", "Friday", Color(0xFF607D8B))
+            Chat(1, "Saved Messages", "You: Photo", "12:45", 0, true),
+            Chat(2, "Alice Johnson", "Hey! How are you doing?", "Yesterday", 3, true, true),
+            Chat(3, "Tech Group", "John: Check out this new feature", "Yesterday", 12, true),
+            Chat(4, "Bob Smith", "Thanks for the help!", "Monday", 0, false, true),
+            Chat(5, "Work Team", "Meeting at 3 PM tomorrow", "Monday", 5, false, false, true),
+            Chat(6, "Mom", "Don't forget to call grandma", "Sunday", 1),
+            Chat(7, "Developers Channel", "New update released! 🚀", "Sunday"),
+            Chat(8, "Charlie Brown", "See you tomorrow!", "Saturday", 0, false, true),
+            Chat(9, "Study Group", "Assignment due next week", "Friday", 2),
+            Chat(10, "Diana Prince", "Thanks for the invite!", "Friday")
         )
     }
 
@@ -125,7 +141,7 @@ fun TelegramMainScreen() {
             ModalDrawerSheet(
                 drawerContainerColor = MaterialTheme.colorScheme.primary
             ) {
-                DrawerContent()
+                DrawerContent(currentUserState.value)
             }
         }
     ) {
@@ -210,7 +226,7 @@ fun TelegramTopBar(onMenuClick: () -> Unit) {
 }
 
 @Composable
-fun DrawerContent() {
+fun DrawerContent(currentUser: UserInfo?) {
     Column(
         modifier = Modifier
             .width(280.dp)
@@ -236,18 +252,29 @@ fun DrawerContent() {
                         .clickable { /* Open profile */ },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "U",
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    if (!currentUser?.avatar.isNullOrEmpty()) {
+                        AsyncImage(
+                            model = currentUser.avatar,
+                            contentDescription = "User Avatar",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Text(
+                            text = currentUser?.firstName?.firstOrNull()?.uppercase() ?: "U",
+                            color = Color.White,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "User Name",
+                    text = currentUser?.firstName ?: "User Name",
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp),
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
@@ -256,14 +283,22 @@ fun DrawerContent() {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "@username",
+                    text = "@${currentUser?.username}",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
                     color = Color.White.copy(alpha = 0.85f)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "ID: ${currentUser?.id}",
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
+                    color = Color.White.copy(alpha = 0.7f)
                 )
             }
         }
 
-        // Menu Items
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -290,12 +325,11 @@ fun DrawerContent() {
             }
 
             item { DrawerMenuItem(icon = Icons.Default.Settings, title = "Settings") }
-            item { DrawerMenuItem(icon = Icons.Default.Help, title = "Help and Feedback") }
+            item { DrawerMenuItem(icon = Icons.AutoMirrored.Filled.Help, title = "Help and Feedback") }
 
             item { Spacer(modifier = Modifier.height(8.dp)) }
         }
 
-        // Extragram Footer
         HorizontalDivider(
             color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.2f)
         )
