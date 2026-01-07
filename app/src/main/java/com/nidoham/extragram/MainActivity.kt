@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -103,7 +104,6 @@ fun TelegramMainScreen() {
             }
         }
     }
-
 
     LaunchedEffect(drawerState) {
         snapshotFlow { drawerState.currentValue }
@@ -233,31 +233,33 @@ fun DrawerContent(currentUser: UserInfo?) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        // Compact Header Section
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(horizontal = 16.dp)
-                .padding(top = 56.dp, bottom = 24.dp)
+                .padding(top = 40.dp, bottom = 16.dp)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.Start
             ) {
+                // Compact Avatar
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
-                        .background(Color.White.copy(alpha = 0.3f), CircleShape)
+                        .size(100.dp)
                         .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f))
                         .clickable { /* Open profile */ },
                     contentAlignment = Alignment.Center
                 ) {
                     if (!currentUser?.avatar.isNullOrEmpty()) {
                         AsyncImage(
-                            model = currentUser.avatar,
+                            model = currentUser?.avatar,
                             contentDescription = "User Avatar",
                             modifier = Modifier
-                                .size(100.dp)
+                                .fillMaxSize()
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
@@ -265,7 +267,7 @@ fun DrawerContent(currentUser: UserInfo?) {
                         Text(
                             text = currentUser?.firstName?.firstOrNull()?.uppercase() ?: "U",
                             color = Color.White,
-                            fontSize = 28.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -273,32 +275,44 @@ fun DrawerContent(currentUser: UserInfo?) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // User name
                 Text(
-                    text = currentUser?.firstName ?: "User Name",
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp),
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
+                    text = "${currentUser?.firstName ?: "User"} ${currentUser?.lastName ?: ""}".trim(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = "@${currentUser?.username}",
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
-                    color = Color.White.copy(alpha = 0.85f)
-                )
+                // Phone or email
+                currentUser?.email?.let { phone ->
+                    Text(
+                        text = phone,
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                }
 
-                Spacer(modifier = Modifier.height(4.dp))
-
+                // Username
                 Text(
-                    text = "ID: ${currentUser?.id}",
+                    text = "@${currentUser?.username ?: "username"}",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = Color.White.copy(alpha = 0.75f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
 
-
+        // Compact Menu items section
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -310,8 +324,8 @@ fun DrawerContent(currentUser: UserInfo?) {
 
             item {
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.2f)
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.15f)
                 )
             }
 
@@ -319,8 +333,8 @@ fun DrawerContent(currentUser: UserInfo?) {
 
             item {
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.2f)
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.15f)
                 )
             }
 
@@ -330,15 +344,16 @@ fun DrawerContent(currentUser: UserInfo?) {
             item { Spacer(modifier = Modifier.height(8.dp)) }
         }
 
+        // Compact Footer
         HorizontalDivider(
-            color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.2f)
+            color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.15f)
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { /* Open Extragram info */ }
-                .padding(16.dp),
+                .padding(horizontal = 12.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -346,15 +361,15 @@ fun DrawerContent(currentUser: UserInfo?) {
                 imageVector = Icons.Default.Rocket,
                 contentDescription = "Extragram",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(16.dp)
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
             Text(
-                text = "Developer by NI Doha Mondol",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                text = "Developed by NI Doha Mondol",
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Medium
             )
         }
@@ -371,21 +386,21 @@ fun DrawerMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = title,
             tint = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(14.dp))
 
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp),
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onBackground
         )
     }
