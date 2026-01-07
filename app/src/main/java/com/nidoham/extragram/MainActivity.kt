@@ -62,12 +62,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nidoham.extragram.ui.theme.ExtragramTheme
-import com.nidoham.extragram.ui.theme.TelegramSpacing
 import com.nidoham.extragram.ui.theme.telegram
 import kotlinx.coroutines.launch
 import com.nidoham.extragram.ui.component.chat.*
-import com.nidoham.extragram.ui.component.stories.*
+import com.nidoham.extragram.ui.theme.ExtragramTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,19 +102,6 @@ fun TelegramMainScreen() {
         val window = (view.context as ComponentActivity).window
         window.statusBarColor = primaryColor.toArgb()
         WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
-    }
-
-    val stories = remember {
-        listOf(
-            Story(0, "My Story", Color(0xFF5CA7F5), false),
-            Story(1, "Alice", Color(0xFFE91E63), true),
-            Story(2, "Bob", Color(0xFF9C27B0), true),
-            Story(3, "Charlie", Color(0xFF3F51B5), true),
-            Story(4, "Diana", Color(0xFF00BCD4), false),
-            Story(5, "Eve", Color(0xFF4CAF50), true),
-            Story(6, "Frank", Color(0xFFFF9800), false),
-            Story(7, "Grace", Color(0xFFFF5722), true)
-        )
     }
 
     val chats = remember {
@@ -173,14 +158,6 @@ fun TelegramMainScreen() {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                item {
-                    StoriesSection(stories = stories)
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = TelegramSpacing.LARGE),
-                        color = MaterialTheme.colorScheme.telegram.divider.copy(alpha = 0.3f)
-                    )
-                }
-
                 items(
                     items = chats,
                     key = { it.id }
@@ -233,21 +210,6 @@ fun TelegramTopBar(onMenuClick: () -> Unit) {
 }
 
 @Composable
-fun StoriesSection(stories: List<Story>) {
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = TelegramSpacing.MEDIUM),
-        contentPadding = PaddingValues(horizontal = TelegramSpacing.LARGE),
-        horizontalArrangement = Arrangement.spacedBy(TelegramSpacing.MEDIUM)
-    ) {
-        items(stories) { story ->
-            StoryItem(story = story)
-        }
-    }
-}
-
-@Composable
 fun DrawerContent() {
     Column(
         modifier = Modifier
@@ -255,7 +217,6 @@ fun DrawerContent() {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Profile Header with Day/Night Toggle
         Box(
             modifier = Modifier
                 .fillMaxWidth()

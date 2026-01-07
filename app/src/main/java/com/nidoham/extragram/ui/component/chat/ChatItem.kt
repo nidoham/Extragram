@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nidoham.extragram.Chat
 import com.nidoham.extragram.ui.theme.TelegramAvatarSize
 import com.nidoham.extragram.ui.theme.TelegramSpacing
 import com.nidoham.extragram.ui.theme.telegram
