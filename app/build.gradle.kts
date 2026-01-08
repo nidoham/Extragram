@@ -1,13 +1,12 @@
-
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
-    alias(libs.plugins.google.services)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -16,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nidoham.extragram"
-        minSdk = 29 // Android 10+
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -24,12 +23,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        // ProGuard rules for release
-        proguardFiles(
-            getDefaultProguardFile("proguard-android-optimize.txt"),
-            "proguard-rules.pro"
-        )
     }
 
     buildTypes {
@@ -40,9 +33,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            // Signing config (configure in keystore.properties)
-            // signingConfig = signingConfigs.getByName("release")
         }
 
         debug {
@@ -62,7 +52,6 @@ android {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
 
-            // Enable experimental features
             freeCompilerArgs.addAll(
                 listOf(
                     "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
@@ -91,95 +80,91 @@ android {
 
 dependencies {
 
+    /* ---------- Desugaring ---------- */
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    // Compose Navigation
-    implementation(libs.androidx.navigation.compose.v296)
+    /* ---------- Compose BOM ---------- */
+    implementation(platform("androidx.compose:compose-bom:2025.12.01"))
 
-// Compose Destinations (easier navigation)
-    implementation(libs.core)
-    ksp(libs.ksp)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.animation:animation:1.10.0")
 
-// Lottie animations
-    implementation(libs.lottie.compose)
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // Desugaring for older Android versions
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    /* ---------- AndroidX ---------- */
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.core:core-splashscreen:1.2.0")
+    implementation("androidx.activity:activity-compose:1.12.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
 
-    // Firebase (using BOM for version management)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.database)
-    implementation(libs.firebase.messaging) // For push notifications
-    implementation(libs.firebase.storage) // For media uploads
+    /* ---------- Navigation ---------- */
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 
-    // Google Play Services
-    implementation(libs.play.services.auth)
+    /* ---------- Compose Destinations ---------- */
+    implementation("io.github.raamcosta.compose-destinations:core:2.3.0")
+    ksp("io.github.raamcosta.compose-destinations:ksp:2.3.0")
 
-    // Extra module
-    implementation(project(":extra"))
+    /* ---------- Lottie ---------- */
+    implementation("com.airbnb.android:lottie-compose:6.7.1")
 
-    // Hilt (Dependency Injection)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
+    /* ---------- Firebase (BOM) ---------- */
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-storage")
 
-    // AndroidX Core
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.core.splashscreen) // Modern splash screen
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    /* ---------- Google Auth ---------- */
+    implementation("com.google.android.gms:play-services-auth:21.5.0")
 
-    // Compose
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.animation)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    /* ---------- Hilt ---------- */
+    implementation("com.google.dagger:hilt-android:2.57.2")
+    ksp("com.google.dagger:hilt-compiler:2.57.2")
 
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+    implementation("androidx.hilt:hilt-work:1.3.0")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
 
-    // Image Loading
-    implementation(libs.coil)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp) // Better networking for Coil
+    /* ---------- Coroutines ---------- */
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
-    // Kotlinx Serialization (JSON parsing)
-    implementation(libs.kotlinx.serialization.json)
+    /* ---------- Serialization ---------- */
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
-    // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play.services)
+    /* ---------- DataStore ---------- */
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
 
-    // DataStore (modern SharedPreferences replacement)
-    implementation(libs.androidx.datastore.preferences)
+    /* ---------- WorkManager ---------- */
+    implementation("androidx.work:work-runtime-ktx:2.11.0")
 
-    // WorkManager (background tasks)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.work)
-    ksp(libs.androidx.hilt.compiler)
+    /* ---------- Paging ---------- */
+    implementation("androidx.paging:paging-runtime:3.3.6")
+    implementation("androidx.paging:paging-compose:3.3.6")
 
-    // Paging 3 (for message pagination)
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
+    /* ---------- Media3 ---------- */
+    implementation("androidx.media3:media3-exoplayer:1.9.0")
+    implementation("androidx.media3:media3-ui:1.9.0")
 
-    // Media3 (ExoPlayer for video/audio)
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.ui)
+    /* ---------- Coil ---------- */
+    implementation("io.coil-kt:coil:2.7.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-network-okhttp:2.7.0")
 
-    // Accompanist (Compose utilities)
-    implementation(libs.accompanist.permissions)
-    implementation(libs.accompanist.systemuicontroller)
+    /* ---------- Accompanist ---------- */
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.37.3")
 
-    // Timber (Logging)
-    implementation(libs.timber)
+    /* ---------- Logging ---------- */
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }

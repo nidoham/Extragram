@@ -22,7 +22,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Extragram"
 include(":app")
-include(":extra")
 
 // Enable Gradle configuration cache for faster builds
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
