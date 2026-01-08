@@ -1,5 +1,6 @@
 package com.nidoham.extragram
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -188,6 +189,8 @@ fun TelegramMainScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelegramTopBar(onMenuClick: () -> Unit) {
+    val context = LocalView.current.context
+
     TopAppBar(
         title = {
             Text(
@@ -208,7 +211,10 @@ fun TelegramTopBar(onMenuClick: () -> Unit) {
             }
         },
         actions = {
-            IconButton(onClick = { /* Search */ }) {
+            IconButton(onClick = {
+                val intent = Intent(context, SearchActivity::class.java)
+                context.startActivity(intent)
+            }) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search",

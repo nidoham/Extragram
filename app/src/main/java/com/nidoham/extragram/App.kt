@@ -8,11 +8,13 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.nidoham.extragram.service.PresenceService
+import dagger.hilt.android.HiltAndroidApp
 
 /**
  * Professional Application class for Extragram.
  * Handles Firebase initialization and global lifecycle monitoring for presence management.
  */
+@HiltAndroidApp
 class App : Application() {
 
     override fun onCreate() {
