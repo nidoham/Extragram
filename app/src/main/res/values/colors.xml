@@ -1,10 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Brand Colors (Telegram-inspired blue) -->
+    <color name="primary">#0088CC</color>
+    <color name="primary_container">#D0E9F7</color>
+    <color name="on_primary_container">#001D35</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary">#5B6E84</color>
+    <color name="secondary_container">#DFE3EA</color>
+    <color name="on_secondary_container">#171C22</color>
+
+    <!-- Tertiary Colors -->
+    <color name="tertiary">#7A5089</color>
+    <color name="tertiary_container">#FFDAFF</color>
+    <color name="on_tertiary_container">#2D1A33</color>
+
+    <!-- Error Colors -->
+    <color name="error">#BA1A1A</color>
+    <color name="error_container">#FFDAD6</color>
+    <color name="on_error_container">#410002</color>
+
+    <!-- Background & Surface (Light Mode) -->
+    <color name="background">#FCFCFF</color>
+    <color name="on_background">#1A1C1E</color>
+    <color name="surface">#FCFCFF</color>
+    <color name="on_surface">#1A1C1E</color>
+    <color name="surface_variant">#DFE3EA</color>
+    <color name="on_surface_variant">#43484D</color>
+
+    <!-- Dark Mode Colors (Night) -->
+    <color name="background_dark">#1A1C1E</color>
+    <color name="on_background_dark">#E2E2E5</color>
+    <color name="surface_dark">#1A1C1E</color>
+    <color name="on_surface_dark">#E2E2E5</color>
+    <color name="surface_variant_dark">#43484D</color>
+    <color name="on_surface_variant_dark">#C3C7CF</color>
+
+    <!-- Additional UI Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="divider">#E5E5EA</color>
+    <color name="divider_dark">#38393C</color>
+
+    <!-- Message Bubble Colors -->
+    <color name="message_sent">#DCF8C6</color>
+    <color name="message_received">#FFFFFF</color>
+    <color name="message_sent_dark">#056162</color>
+    <color name="message_received_dark">#262D31</color>
+
+    <!-- Status Colors -->
+    <color name="online">#4CAF50</color>
+    <color name="away">#FFC107</color>
+    <color name="offline">#9E9E9E</color>
+
+    <!-- Notification Color -->
+    <color name="notification_color">#0088CC</color>
+
+    <!-- Link Color -->
+    <color name="link">#0088CC</color>
+
+    <!-- Selection Colors -->
+    <color name="selection_highlight">#E3F2FD</color>
+    <color name="selection_highlight_dark">#1E3A5F</color>
+
+    <!-- Overlay Colors -->
+    <color name="overlay_light">#80000000</color>
+    <color name="overlay_dark">#CC000000</color>
+
+    <!-- Recording/Call Colors -->
+    <color name="recording">#F44336</color>
+    <color name="call_green">#00C853</color>
+    <color name="call_red">#D32F2F</color>
 </resources>

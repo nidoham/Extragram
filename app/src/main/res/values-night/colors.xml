@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Override Colors -->
+
+    <!-- Background & Surface (Dark Mode) -->
+    <color name="background">#1A1C1E</color>
+    <color name="on_background">#E2E2E5</color>
+    <color name="surface">#1A1C1E</color>
+    <color name="on_surface">#E2E2E5</color>
+    <color name="surface_variant">#43484D</color>
+    <color name="on_surface_variant">#C3C7CF</color>
+
+    <!-- Primary Colors (Slightly adjusted for dark mode) -->
+    <color name="primary">#6EC6FF</color>
+    <color name="primary_container">#004D73</color>
+    <color name="on_primary_container">#C9E6FF</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary">#B8C8DA</color>
+    <color name="secondary_container">#3D4754</color>
+    <color name="on_secondary_container">#D4E4F5</color>
+
+    <!-- Divider -->
+    <color name="divider">#38393C</color>
+
+    <!-- Message Bubbles (Dark Mode) -->
+    <color name="message_sent">#056162</color>
+    <color name="message_received">#262D31</color>
+
+    <!-- Selection -->
+    <color name="selection_highlight">#1E3A5F</color>
+
+    <!-- Status bar (Dark Mode) -->
+    <color name="status_bar">#000000</color>
+</resources>

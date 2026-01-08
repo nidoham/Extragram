@@ -1,3 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Name -->
     <string name="app_name">Extragram</string>
+
+    <!-- Notification Channels -->
+    <string name="default_notification_channel_id">chat_messages</string>
+    <string name="channel_messages_name">Chat Messages</string>
+    <string name="channel_messages_description">Notifications for new messages</string>
+    <string name="channel_calls_name">Voice &amp; Video Calls</string>
+    <string name="channel_calls_description">Incoming call notifications</string>
+    <string name="channel_service_name">Background Service</string>
+    <string name="channel_service_description">Keeps the app running for presence status</string>
+    <string name="channel_groups_name">Group Messages</string>
+    <string name="channel_groups_description">Notifications for group messages and mentions</string>
+
+    <!-- Common Actions -->
+    <string name="action_send">Send</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_forward">Forward</string>
+    <string name="action_reply">Reply</string>
+    <string name="action_save">Save</string>
+    <string name="action_share">Share</string>
+    <string name="action_search">Search</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_loading">Loading…</string>
+
+    <!-- Onboarding -->
+    <string name="onboard_welcome">Welcome to Extragram</string>
+    <string name="onboard_subtitle">Fast, secure, and private messaging</string>
+    <string name="onboard_get_started">Get Started</string>
+    <string name="onboard_login">Login</string>
+    <string name="onboard_signup">Sign Up</string>
+
+    <!-- Authentication -->
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_phone">Phone Number</string>
+    <string name="auth_code">Verification Code</string>
+    <string name="auth_forgot_password">Forgot Password?</string>
+    <string name="auth_login_success">Login successful</string>
+    <string name="auth_login_failed">Login failed</string>
+    <string name="auth_signup_success">Account created successfully</string>
+    <string name="auth_signup_failed">Sign up failed</string>
+
+    <!-- Chat -->
+    <string name="chat_type_message">Type a message…</string>
+    <string name="chat_online">online</string>
+    <string name="chat_offline">offline</string>
+    <string name="chat_typing">typing…</string>
+    <string name="chat_last_seen">last seen %s</string>
+    <string name="chat_recording">Recording…</string>
+    <string name="chat_no_messages">No messages yet</string>
+    <string name="chat_message_deleted">This message was deleted</string>
+    <string name="chat_message_edited">Edited</string>
+
+    <!-- Calls -->
+    <string name="call_incoming">Incoming call</string>
+    <string name="call_outgoing">Calling…</string>
+    <string name="call_connected">Connected</string>
+    <string name="call_ended">Call ended</string>
+    <string name="call_missed">Missed call</string>
+    <string name="call_answer">Answer</string>
+    <string name="call_decline">Decline</string>
+
+    <!-- Media -->
+    <string name="media_photo">Photo</string>
+    <string name="media_video">Video</string>
+    <string name="media_audio">Voice message</string>
+    <string name="media_file">File</string>
+    <string name="media_location">Location</string>
+    <string name="media_contact">Contact</string>
+
+    <!-- Permissions -->
+    <string name="permission_camera">Camera permission is needed to take photos</string>
+    <string name="permission_storage">Storage permission is needed to access files</string>
+    <string name="permission_microphone">Microphone permission is needed for voice messages</string>
+    <string name="permission_location">Location permission is needed to share your location</string>
+    <string name="permission_contacts">Contacts permission is needed to find friends</string>
+    <string name="permission_notifications">Notification permission is needed for new messages</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_profile">Profile</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_privacy">Privacy and Security</string>
+    <string name="settings_chat">Chat Settings</string>
+    <string name="settings_data">Data and Storage</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System Default</string>
+
+    <!-- Profile -->
+    <string name="profile_name">Name</string>
+    <string name="profile_bio">Bio</string>
+    <string name="profile_phone">Phone</string>
+    <string name="profile_username">Username</string>
+    <string name="profile_edit">Edit Profile</string>
+    <string name="profile_photo_change">Change Photo</string>
+
+    <!-- Search -->
+    <string name="search_hint">Search messages…</string>
+    <string name="search_no_results">No results found</string>
+    <string name="search_recent">Recent</string>
+
+    <!-- Errors -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_server">Server error. Please try again later.</string>
+    <string name="error_invalid_input">Invalid input</string>
+
+    <!-- Time Formats -->
+    <string name="time_just_now">just now</string>
+    <string name="time_minute_ago">1 minute ago</string>
+    <string name="time_minutes_ago">%d minutes ago</string>
+    <string name="time_hour_ago">1 hour ago</string>
+    <string name="time_hours_ago">%d hours ago</string>
+    <string name="time_yesterday">yesterday</string>
+    <string name="time_days_ago">%d days ago</string>
+
+    <!-- Presence Service -->
+    <string name="presence_connected">Connected</string>
+    <string name="presence_syncing">Syncing…</string>
+
+    <!-- File Provider -->
+    <string name="file_provider_authority">com.nidoham.extragram.fileprovider</string>
 </resources>

@@ -2,117 +2,167 @@ package com.nidoham.extragram.service
 
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
-import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
-import com.nidoham.extra.user.Presence
-import com.nidoham.extra.user.UserRepository
-import kotlinx.coroutines.*
+import com.nidoham.extragram.R
+import timber.log.Timber
 
+/**
+ * Foreground service to manage user presence status (online/offline/away).
+ *
+ * Features:
+ * - Real-time presence updates using Firebase Realtime Database
+ * - Automatic offline status on app close
+ * - "Last seen" timestamp tracking
+ * - Typing indicators support
+ */
 class PresenceService : Service() {
 
-    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val auth = FirebaseAuth.getInstance()
-    private val userRepository = UserRepository()
-    private val rtdb = FirebaseDatabase.getInstance()
+    private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val database: FirebaseDatabase by lazy { FirebaseDatabase.getInstance() }
 
-    private var lastConnectionState: Boolean? = null
-    private var lastPresenceUpdate: String? = null
-    private var lastPresenceUpdateTime: Long = 0
+    private var userId: String? = null
+    private val presenceRef by lazy {
+        userId?.let { database.getReference("presence/$it") }
+    }
 
-    private val listeners = mutableListOf<() -> Unit>()
+    companion object {
+        private const val NOTIFICATION_ID = 1001
+        private const val CHANNEL_ID = "service_channel"
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        userId = firebaseAuth.currentUser?.uid
+
+        if (userId != null) {
+            setupPresenceTracking()
+            startForeground(NOTIFICATION_ID, createNotification())
+            Timber.d("PresenceService created for user: $userId")
+        } else {
+            Timber.w("PresenceService started without logged-in user")
+            stopSelf()
+        }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (userId == null) {
+            Timber.w("No user logged in, stopping service")
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        return START_STICKY // Service will restart if killed
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            setupPresence(userId)
-        } else {
-            stopSelf()
-        }
-        return START_STICKY
+    override fun onDestroy() {
+        super.onDestroy()
+        setUserOffline()
+        Timber.d("PresenceService destroyed")
     }
 
-    private fun setupPresence(userId: String) {
-        val presenceRef = rtdb.getReference("/status/$userId")
-        val connectedRef = rtdb.getReference(".info/connected")
+    /**
+     * Setup Firebase Realtime Database presence tracking
+     */
+    private fun setupPresenceTracking() {
+        val userId = this.userId ?: return
 
-        val listener = object : com.google.firebase.database.ValueEventListener {
+        // Create presence reference
+        val presenceData = mapOf(
+            "status" to "online",
+            "lastSeen" to ServerValue.TIMESTAMP
+        )
+
+        // Set user online
+        presenceRef?.setValue(presenceData)
+            ?.addOnSuccessListener {
+                Timber.d("User presence set to online")
+                setupDisconnectHandler()
+            }
+            ?.addOnFailureListener { e ->
+                Timber.e(e, "Failed to set presence")
+            }
+
+        // Monitor connection state
+        val connectedRef = database.getReference(".info/connected")
+        connectedRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 val connected = snapshot.getValue(Boolean::class.java) ?: false
-
-                if (connected == lastConnectionState) {
-                    return
-                }
-                lastConnectionState = connected
-
                 if (connected) {
-                    presenceRef.setValue(
-                        mapOf(
-                            "state" to "online",
-                            "last_changed" to ServerValue.TIMESTAMP
-                        )
-                    )
-                    serviceScope.launch {
-                        updatePresenceWithRetry(userId, Presence.ONLINE)
-                    }
-                    presenceRef.onDisconnect().setValue(
-                        mapOf(
-                            "state" to "offline",
-                            "last_changed" to ServerValue.TIMESTAMP
-                        )
-                    )
+                    Timber.d("Connected to Firebase")
+                    presenceRef?.setValue(presenceData)
+                    setupDisconnectHandler()
+                } else {
+                    Timber.d("Disconnected from Firebase")
                 }
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
-                Log.e("PresenceService", "RTDB Connection error: ${error.message}")
+                Timber.e("Connection monitoring error: ${error.message}")
             }
-        }
-
-        connectedRef.addValueEventListener(listener)
-        listeners.add { connectedRef.removeEventListener(listener) }
+        })
     }
 
-    private suspend fun updatePresenceWithRetry(userId: String, presence: Int, retryCount: Int = 0) {
-        try {
-            val now = System.currentTimeMillis()
-            val key = "$userId:$presence"
-
-            if (key == lastPresenceUpdate && (now - lastPresenceUpdateTime) < 5000) {
-                Log.d("PresenceService", "Skipping duplicate presence update")
-                return
-            }
-
-            lastPresenceUpdate = key
-            lastPresenceUpdateTime = now
-
-            val success = userRepository.updatePresence(userId, presence)
-
-            if (!success && retryCount < 3) {
-                val backoffMs = 1000L * (1 shl retryCount)
-                Log.d("PresenceService", "Retrying presence update (attempt ${retryCount + 1}) after ${backoffMs}ms")
-                delay(backoffMs)
-                updatePresenceWithRetry(userId, presence, retryCount + 1)
-            }
-        } catch (e: Exception) {
-            Log.e("PresenceService", "Error updating presence: ${e.message}")
+    /**
+     * Setup automatic offline status on disconnect
+     */
+    private fun setupDisconnectHandler() {
+        presenceRef?.onDisconnect()?.setValue(
+            mapOf(
+                "status" to "offline",
+                "lastSeen" to ServerValue.TIMESTAMP
+            )
+        )?.addOnSuccessListener {
+            Timber.d("Disconnect handler set")
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            serviceScope.launch {
-                userRepository.updatePresence(userId, Presence.OFFLINE)
-                listeners.forEach { it.invoke() }
-                listeners.clear()
-                serviceScope.cancel()
-            }
+    /**
+     * Manually set user offline
+     */
+    private fun setUserOffline() {
+        presenceRef?.setValue(
+            mapOf(
+                "status" to "offline",
+                "lastSeen" to ServerValue.TIMESTAMP
+            )
+        )?.addOnSuccessListener {
+            Timber.d("User status set to offline")
         }
+    }
+
+    /**
+     * Create foreground notification (required for Android 8+)
+     */
+    private fun createNotification() = NotificationCompat.Builder(this, CHANNEL_ID)
+        .setContentTitle("Extragram")
+        .setContentText("Connected")
+        .setSmallIcon(R.drawable.ic_notification)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setOngoing(true)
+        .setShowWhen(false)
+        .setCategory(NotificationCompat.CATEGORY_SERVICE)
+        .build()
+
+    /**
+     * Public helper to update status (e.g., "typing", "recording")
+     */
+    fun updateStatus(status: String) {
+        presenceRef?.child("status")?.setValue(status)
+    }
+
+    /**
+     * Update typing indicator for specific chat
+     */
+    fun setTypingStatus(chatId: String, isTyping: Boolean) {
+        val userId = this.userId ?: return
+        database.getReference("typing/$chatId/$userId")
+            .setValue(if (isTyping) ServerValue.TIMESTAMP else null)
     }
 }

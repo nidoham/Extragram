@@ -9,18 +9,20 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        maven { url = uri("https://jitpack.io") }
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "Extragram"
 include(":app")
 include(":extra")
+
+// Enable Gradle configuration cache for faster builds
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
